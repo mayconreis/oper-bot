@@ -1,0 +1,17 @@
+{
+  "name": "oper_bot",
+  "version": "1.0.0",
+  "description": "Bot Time de Operações",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node app.js"
+  },
+  "author": "Maycon Reis <maycon.jesus@multilaser.com.br>",
+  "license": "MIT",
+  "dependencies": {
+    "@slack/bolt": "^3.12.1",
+    "dotenv": "^16.0.1",
+    "node-cron": "^3.0.2"
+  }
+}
