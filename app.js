@@ -22,18 +22,24 @@ const escolheMediador = () => {
     sorteados.push(mediadores[sugestao]);
     return mediadores[sugestao];
 }
-
+let channelId
+let mediadorHoje
 // ID of the channel you want to send the message to
-const channelId = {
-    "prod": "G01GHFSEK1C",
-    "test": "C03TGF7ESTG"
+if (process.env.PORT) {
+    channelId = process.env.CHANNEL_ID_PROD
+} else {
+    channelId = process.env.CHANNEL_ID_TEST
 }
 
-cron.schedule('26 10 * * 1-5', async () => {
+cron.schedule('15 8 * * 1-5', async () => {
     console.log('App rodando todos os dias as 08:15');
+    mediadorHoje = escolheMediador()
+    const data = new Date()
+    const dataFormatada = `${data.getDate()}/${(data.getMonth() + 1)}/${data.getFullYear()}`
+    console.log(`${dataFormatada} - Mediador de hoje: ${mediadorHoje}`)
     // Call the chat.postMessage method using the WebClient
     const result = await app.client.chat.postMessage({
-        channel: channelId.test,
+        channel: channelId,
         text: "Daily",
         "blocks": [
             {
@@ -51,7 +57,7 @@ cron.schedule('26 10 * * 1-5', async () => {
                 "type": "section",
                 "text": {
                     "type": "mrkdwn",
-                    "text": `*Mediador: *<@${escolheMediador()}>`
+                    "text": `*Mediador: *<@${mediadorHoje}>`
                 }
             },
             {
@@ -77,7 +83,7 @@ cron.schedule('26 10 * * 1-5', async () => {
         if (err) return console.log(err);
         console.log(res);
     });
-}, { schedule : true, timezone: 'America/Sao_Paulo' })
+}, { schedule: true, timezone: 'America/Sao_Paulo' })
 
 // Start your app
 app.start(process.env.PORT || 3000);
