@@ -31,8 +31,8 @@ if (process.env.PORT) {
     channelId = process.env.CHANNEL_ID_TEST
 }
 
-cron.schedule('15 8 * * 1-5', async () => {
-    console.log('App rodando todos os dias as 08:15');
+cron.schedule('30 8 * * 1-5', async () => {
+    console.log('App rodando todos os dias as 08:30');
     mediadorHoje = escolheMediador()
     const data = new Date()
     const dataFormatada = `${data.getDate()}/${(data.getMonth() + 1)}/${data.getFullYear()}`
