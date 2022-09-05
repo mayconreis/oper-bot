@@ -31,7 +31,7 @@ if (process.env.PORT) {
     channelId = process.env.CHANNEL_ID_TEST
 }
 
-cron.schedule('35 8 * * 1-5', async () => {
+cron.schedule('15 8 * * 1-5', async () => {
     console.log('App rodando todos os dias as 08:35');
     mediadorHoje = escolheMediador()
     const data = new Date()
