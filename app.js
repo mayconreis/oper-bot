@@ -1,21 +1,6 @@
-const { App } = require("@slack/bolt");
+const { App, ExpressReceiver } = require("@slack/bolt");
 const cron = require('node-cron');
 require('dotenv').config();
-
-const app = new App({
-    signingSecret: process.env.SLACK_SIGNING_SECRET,
-    token: process.env.SLACK_BOT_TOKEN,
-    customRoutes: [
-        {
-            path: '/',
-            method: ['GET'],
-            handler: (req, res) => {
-                res.writeHead(200)
-                res.end('App rodando...')
-            }
-        }
-    ]
-});
 
 let sorteados = [];
 let valorMaximo = 21;
@@ -34,6 +19,14 @@ const escolheMediador = () => {
 }
 let channelId
 let mediadorHoje
+
+const receiver = new ExpressReceiver({ signingSecret: process.env.SLACK_SIGNING_SECRET })
+
+const app = new App({
+    token: process.env.SLACK_BOT_TOKEN,
+    receiver
+});
+
 // ID of the channel you want to send the message to
 if (process.env.PORT) {
     channelId = process.env.CHANNEL_ID_PROD
@@ -41,56 +34,63 @@ if (process.env.PORT) {
     channelId = process.env.CHANNEL_ID_TEST
 }
 
-mediadorHoje = escolheMediador()
-const data = new Date()
-const dataFormatada = `${data.getDate()}/${(data.getMonth() + 1)}/${data.getFullYear()}`
-console.log(`${dataFormatada} - Mediador de hoje: ${mediadorHoje}`)
 // Call the chat.postMessage method using the WebClient
-const result = await app.client.chat.postMessage({
-    channel: channelId,
-    text: "Daily",
-    "blocks": [
-        {
-            "type": "header",
-            "text": {
-                "type": "plain_text",
-                "text": "Bora pra Daily! 😍",
-                "emoji": true
-            }
-        },
-        {
-            "type": "divider"
-        },
-        {
-            "type": "section",
-            "text": {
-                "type": "mrkdwn",
-                "text": `*Mediador: *<@${mediadorHoje}>`
-            }
-        },
-        {
-            "type": "actions",
-            "elements": [
-                {
-                    "type": "button",
-                    "text": {
-                        "type": "plain_text",
-                        "text": "Entrar na Daily",
-                        "emoji": true
-                    },
-                    "style": "primary",
-                    "url": "https://meet.google.com/unx-wwvt-mah"
+async function postarMensagem() {
+    let mediadorHoje = escolheMediador()
+    const data = new Date()
+    const dataFormatada = `${data.getDate()}/${(data.getMonth() + 1)}/${data.getFullYear()}`
+    console.log(`${dataFormatada} - Mediador de hoje: ${mediadorHoje}`)
+    
+    await app.client.chat.postMessage({
+        channel: channelId,
+        text: "Daily",
+        "blocks": [
+            {
+                "type": "header",
+                "text": {
+                    "type": "plain_text",
+                    "text": "Bora pra Daily! 😍",
+                    "emoji": true
                 }
-            ]
-        },
-        {
-            "type": "divider"
-        },
-    ]
-}, (err, res) => {
-    if (err) return console.log(err);
-    console.log(res);
-});
+            },
+            {
+                "type": "divider"
+            },
+            {
+                "type": "section",
+                "text": {
+                    "type": "mrkdwn",
+                    "text": `*Mediador: *<@${mediadorHoje}>`
+                }
+            },
+            {
+                "type": "actions",
+                "elements": [
+                    {
+                        "type": "button",
+                        "text": {
+                            "type": "plain_text",
+                            "text": "Entrar na Daily",
+                            "emoji": true
+                        },
+                        "style": "primary",
+                        "url": "https://meet.google.com/unx-wwvt-mah"
+                    }
+                ]
+            },
+            {
+                "type": "divider"
+            },
+        ]
+    })
+    .then()
+    .catch((err) => {console.log(err)})
+}
+
+receiver.router.get('/escolhe-mediador', (req, res) => {
+    postarMensagem()
+    res.send('OK')
+})
 
 // Start your app
 app.start(process.env.PORT || 3000);
