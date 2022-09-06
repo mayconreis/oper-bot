@@ -11,7 +11,7 @@ const app = new App({
             method: ['GET'],
             handler: (req, res) => {
                 res.writeHead(200)
-                res.end('App rodando!')
+                res.end('App rodando...')
             }
         }
     ]
