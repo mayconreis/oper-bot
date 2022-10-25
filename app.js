@@ -1,24 +1,22 @@
 const { App, ExpressReceiver } = require("@slack/bolt");
-const cron = require('node-cron');
 require('dotenv').config();
 
 let sorteados = [];
-let valorMaximo = 21;
+let valorMaximo = 20;
 
 const escolheMediador = () => {
-    const mediadores = ['Maycon', 'Gui', 'Moita', 'Danilão', 'Icaro', 'Klesinha', 'João', 'Gustaff', 'Little Life', 'Cynthia', 'Bruno', 'Amanda', 'Ralf', 'Arthur', 'Ricardo', 'William', 'Matheus', 'Danilo Araujo', 'Luan', 'Anderson', 'Bruno Samurai'];
-    if (sorteados.length == valorMaximo) {
+    const mediadores = ['Maycon', 'Gui', 'Moita', 'Danilão', 'Icaro', 'Klesinha', 'João', 'Gustaff', 'Little Life', 'Cynthia', 'Bruno', 'Amanda', 'Ralf', 'Arthur', 'Ricardo', 'William', 'Danilo Araujo', 'Luan', 'Anderson', 'Bruno Samurai'];
+    if (sorteados.length === valorMaximo) {
         sorteados = [];
     }
     let sugestao = Math.floor(Math.random() * valorMaximo);
     while (sorteados.indexOf(mediadores[sugestao]) >= 0) {
-        sugestao = Math.ceil(Math.random() * (20 - 0) + 0);
+        sugestao = Math.ceil(Math.random() * (19));
     }
     sorteados.push(mediadores[sugestao]);
     return mediadores[sugestao];
 }
 let channelId
-let mediadorHoje
 
 const receiver = new ExpressReceiver({ signingSecret: process.env.SLACK_SIGNING_SECRET })
 
